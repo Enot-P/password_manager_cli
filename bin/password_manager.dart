@@ -6,11 +6,21 @@ import 'package:password_manager/password_manager.dart';
 // String version = Platform.version;
 
 Future<void> main(List<String> arguments) async {
-  await Password.updateListPass();
+  await Future.wait([
+    Password.initialize().then((_) => Password.updateListPass()),
+  ]);
   if (arguments.isNotEmpty) {
     switch (arguments.first) {
       case '--help' || '-h':
-        print('TO-DO add help');
+        print('Usage: dart program.dart [command]');
+        print('Commands:');
+        print('  -getAllPass          List all passwords');
+        print('  -createPass <name>   Create a new password for service');
+        print('  -delete, -d <name>   Delete password for service');
+        print('  --help, -h           Show this help message');
+        print('  --version, -v        Show version');
+        print('  --contacts, -c       Show contact information');
+        print('  <name>               Get password for service');
       case '--version' || '-v':
         print(Platform.version);
       case '--contacts' || '-c':

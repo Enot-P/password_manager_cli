@@ -9,21 +9,48 @@ import 'package:encrypt/encrypt.dart';
 class Password {
   late String _password;
   get password => _password;
-  final Key _key = Key.fromUtf8("lCOrglfdilx7>O\"LDsv<SGpeOF,\j:&\"a");
+  static late final Key _key;
   late IV _iv;
   static Directory _passDir = Directory('passwords');
   static List<Password> _listPass = [];
   late String _encryptedData; // храним зашифрованные данные как base64 строку
   final String name;
 
+  // Статический блок инициализации для _key
+  static Future<void> initialize() async {
+    _key = await _loadOrCreateKey();
+  }
+
   Password._({required this.name, required String password})
     : _password = password;
 
   factory Password({required service}) {
+    _key = _loadOrCreateKey() as Key;
     final newPassword = Password._(name: service, password: _generateKey(20));
     newPassword._savePassword();
     _listPass.add(newPassword);
     return newPassword;
+  }
+
+  static Key _generateRandomKey() {
+    final rand = Random.secure();
+    final keyBytes = Uint8List(32); // 256-битный ключ для AES
+    for (int i = 0; i < keyBytes.length; i++) {
+      keyBytes[i] = rand.nextInt(256);
+    }
+    return Key(keyBytes);
+  }
+
+  static Future<Key> _loadOrCreateKey() async {
+    final keyFile = File('passwords/encryption_key.bin');
+    if (await keyFile.exists()) {
+      final keyBytes = await keyFile.readAsBytes();
+      return Key(keyBytes);
+    } else {
+      final key = _generateRandomKey();
+      await keyFile.writeAsBytes(key.bytes);
+      return key;
+    }
   }
 
   static updateListPass() async {
