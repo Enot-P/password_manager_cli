@@ -1,0 +1,35 @@
+name: Build manpass
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: Get Dart version
+        run: dart --version
+
+      - name: Compile manpass
+        run: |
+          mkdir -p build
+          dart compile exe manpass.dart -o build/manpass${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: manpass-${{ matrix.os }}
+          path: build/*
