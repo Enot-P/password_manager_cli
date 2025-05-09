@@ -42,7 +42,10 @@ class Password {
   }
 
   static Future<Key> _loadOrCreateKey() async {
-    final keyFile = File('passwords/encryption_key.bin');
+    final keyFile = File('${_passDir.path}/encryption_key.bin');
+    if (!await _passDir.exists()) {
+      await _passDir.create(recursive: true);
+    }
     if (await keyFile.exists()) {
       final keyBytes = await keyFile.readAsBytes();
       return Key(keyBytes);
