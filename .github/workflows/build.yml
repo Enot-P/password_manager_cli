@@ -1,35 +1,26 @@
-name: Build manpass
+name: Dart
 
 on:
   push:
-    branches:
-      - master
-  workflow_dispatch:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        sdk: [3.1, stable, beta]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
-
-      - name: Get Dart version
-        run: dart --version
-
-      - name: Compile manpass
-        run: |
-          mkdir -p build
-          dart compile exe manpass.dart -o build/manpass${{ matrix.os == 'windows-latest' && '.exe' || '' }}
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
         with:
-          name: manpass-${{ matrix.os }}
-          path: build/*
+          sdk: ${{ matrix.sdk }}
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Run tests
+        run: dart test
