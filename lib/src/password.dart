@@ -1,55 +1,107 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' show Random;
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:encrypt/encrypt.dart';
 
 class Password {
   late String _password;
   get password => _password;
-  final String service;
-  static List<Password> listPass = [];
+  final Key _key = Key.fromUtf8("lCOrglfdilx7>O\"LDsv<SGpeOF,\j:&\"a");
+  late IV _iv;
+  static Directory _passDir = Directory('passwords');
+  static List<Password> _listPass = [];
+  late String _encryptedData; // храним зашифрованные данные как base64 строку
+  final String name;
 
-  Password._({required this.service, required String password})
+  Password._({required this.name, required String password})
     : _password = password;
 
   factory Password({required service}) {
-    final newPassword = Password._(
-      service: service,
-      password: _generateKey(20),
-    );
-    listPass.add(newPassword);
+    final newPassword = Password._(name: service, password: _generateKey(20));
+    newPassword._savePassword();
+    _listPass.add(newPassword);
     return newPassword;
   }
 
-  static getPasswords() async {
-    Directory passDir = Directory('passwords');
+  static updateListPass() async {
+    _passDir.create(recursive: true);
     try {
-      await for (var entity in passDir.list()) {
-        File pass = File(entity.path);
-        String passContent = await pass.readAsString();
-        listPass.add(
-          Password._(service: entity.path.substring(10), password: passContent),
+      await for (var entity in _passDir.list()) {
+        if (entity is! File) continue;
+        String passContent = await (entity as File).readAsString();
+
+        Password component = Password._(
+          name: entity.path.split('\\').last,
+          password: '',
         );
+        component._encryptedData = passContent;
+        component.decryptPassword();
+        print("component: $component");
+        if (!_listPass.contains(component)) {
+          _listPass.add(component);
+        }
       }
     } catch (ex) {
       print(ex);
     }
-    print("name\t| password");
-    print("${'-' * 7} | ${'-' * 20}");
-    listPass.forEach(print);
-    print(listPass.length);
   }
 
-  void updatePassword() {}
+  void deletePassword() {
+    try {
+      decryptPassword();
+      _listPass.removeWhere((item) => item.name == this.name);
+      if (_listPass.isEmpty) {
+        print("There is no such password");
+        return;
+      }
+      File filePass = File('${_passDir.path}/${this.name}');
+      filePass.delete();
+      print("Password successful deleted");
+    } catch (e) {
+      print("Error delete password: $e");
+    }
+  }
 
-  void deletePassword() {}
+  void encryptPassword() {
+    _iv = IV.fromLength(16);
+    final encrypter = Encrypter(AES(_key));
+    final encrypted = encrypter.encrypt(_password, iv: _iv);
+
+    final combined = [..._iv.bytes, ...encrypted.bytes];
+    _encryptedData = base64.encode(combined);
+  }
+
+  void decryptPassword() {
+    try {
+      final combined = base64.decode(_encryptedData);
+      _iv = IV(Uint8List.fromList(combined.sublist(0, 16)));
+      final encrypted = Encrypted(Uint8List.fromList(combined.sublist(16)));
+      final encrypter = Encrypter(AES(_key));
+      _password = encrypter.decrypt(encrypted, iv: _iv);
+    } catch (e) {
+      print("Error in decrypt: $e");
+    }
+  }
+
+  static String getPassword(String name) {
+    return _listPass.where((e) => e.name == name).first._password;
+  }
+
+  static getAllPasswords() async {
+    print("name\t| password");
+    print("${'-' * 7} | ${'-' * 20}");
+    _listPass.forEach(print);
+    print(_listPass.length);
+  }
 
   Future<void> _savePassword() async {
-    File filePass = File('passwords/${this.service}');
-    Future.microtask(() {
-      filePass.create(recursive: true);
-    });
-    filePass.writeAsString(this._password);
+    encryptPassword();
+    File filePass = File('${_passDir.path}/${this.name}');
+    await filePass.create(recursive: true);
+    filePass.writeAsString(this._encryptedData);
   }
 
   static String _generateKey(int length) {
@@ -82,11 +134,8 @@ class Password {
     return result;
   }
 
-  void encryptPassword() {}
-  void decryptPassword() {}
-
   @override
   String toString() {
-    return "$service\t| $_password";
+    return "$name\t| $_password";
   }
 }
