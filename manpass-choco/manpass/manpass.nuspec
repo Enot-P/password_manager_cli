@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>manpass</id>
+    <version>1.0.0</version>
+    <title>ManPass CLI</title>
+    <authors>Enot-P</authors>
+    <owners>Enot-P</owners>
+    <licenseUrl>https://github.com/Enot-P/password_manager_cli/blob/main/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/Enot-P/password_manager_cli</projectUrl>
+    <iconUrl>https://github.com/Enot-P/password_manager_cli/blob/master/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A simple CLI password manager for Linux, macOS, and Windows.</description>
+    <releaseNotes>Initial release of ManPass CLI, a command-line password manager.</releaseNotes>
+    <summary>ManPass: A command-line password manager.</summary>
+    <tags>cli password-manager manpass</tags>
+    <dependencies />
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

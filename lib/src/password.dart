@@ -2,16 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math' show Random;
 import 'dart:typed_data';
-
-import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 
 class Password {
   late String _password;
   static late final Key _key;
   late IV _iv;
-  static Directory _passDir = Directory('passwords');
-  static List<Password> _listPass = [];
+  static final Directory _passDir = Directory('passwords');
+  static final List<Password> _listPass = [];
   late String _encryptedData; // храним зашифрованные данные как base64 строку
   get password => _password;
   static get passDir => _passDir;
@@ -63,7 +61,7 @@ class Password {
     try {
       await for (var entity in _passDir.list()) {
         if (entity is! File) continue;
-        String passContent = await (entity as File).readAsString();
+        String passContent = await (entity).readAsString();
 
         Password component = Password._(
           name: entity.path.split('\\').last,
@@ -84,12 +82,12 @@ class Password {
   void deletePassword() {
     try {
       decryptPassword();
-      _listPass.removeWhere((item) => item.name == this.name);
+      _listPass.removeWhere((item) => item.name == name);
       if (_listPass.isEmpty) {
         print("There is no such password");
         return;
       }
-      File filePass = File('${_passDir.path}/${this.name}');
+      File filePass = File('${_passDir.path}/${name}');
       filePass.delete();
       print("Password successful deleted");
     } catch (e) {
@@ -131,9 +129,9 @@ class Password {
 
   Future<void> _savePassword() async {
     encryptPassword();
-    File filePass = File('${_passDir.path}/${this.name}');
+    File filePass = File('${_passDir.path}/${name}');
     await filePass.create(recursive: true);
-    filePass.writeAsString(this._encryptedData);
+    filePass.writeAsString(_encryptedData);
   }
 
   static String _generateKey(int length) {
