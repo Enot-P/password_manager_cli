@@ -46,7 +46,7 @@ jobs:
           mkdir output
           dart compile exe bin/manpass.dart -o output/manpass${{ matrix.os == 'windows-latest' && '.exe' || '' }}
       - name: Debug output directory
-        run: ls -la output/
+        run: dir output/
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
