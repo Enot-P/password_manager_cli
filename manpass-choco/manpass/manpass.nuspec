@@ -6,9 +6,12 @@
     <title>ManPass CLI</title>
     <authors>Enot-P</authors>
     <owners>Enot-P</owners>
-    <licenseUrl>https://github.com/Enot-P/password_manager_cli/blob/main/LICENSE</licenseUrl>
+    <licenseUrl>https://raw.githubusercontent.com/Enot-P/password_manager_cli/refs/heads/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/Enot-P/password_manager_cli</projectUrl>
-    <iconUrl>https://github.com/Enot-P/password_manager_cli/blob/master/icon.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/Enot-P/password_manager_cli/refs/heads/master/icon.png</iconUrl>
+    <packageSourceUrl>https://github.com/Enot-P/password_manager_cli/tree/main/manpass-choco</packageSourceUrl>
+    <docsUrl>https://github.com/Enot-P/password_manager_cli#readme</docsUrl>
+    <bugTrackerUrl>https://github.com/Enot-P/password_manager_cli/issues</bugTrackerUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A simple CLI password manager for Linux, macOS, and Windows.</description>
     <releaseNotes>Initial release of ManPass CLI, a command-line password manager.</releaseNotes>
