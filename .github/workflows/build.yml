@@ -8,7 +8,7 @@ on:
     branches: [master]
 
 permissions:
-  contents: write
+  contents: write # Необходимо для создания релизов
 
 jobs:
   test:
@@ -46,7 +46,13 @@ jobs:
           mkdir output
           dart compile exe bin/manpass.dart -o output/manpass${{ matrix.os == 'windows-latest' && '.exe' || '' }}
       - name: Debug output directory
-        run: dir output/
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            dir output/
+          else
+            ls -la output/
+          fi
+        shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
