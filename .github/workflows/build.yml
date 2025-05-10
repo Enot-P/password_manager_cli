@@ -58,33 +58,3 @@ jobs:
         with:
           name: binary-${{ matrix.os }}
           path: output/
-
-  publish-release:
-    needs: release
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: binary-ubuntu-latest
-          path: binaries/linux/
-      - uses: actions/download-artifact@v4
-        with:
-          name: binary-macos-latest
-          path: binaries/macos/
-      - uses: actions/download-artifact@v4
-        with:
-          name: binary-windows-latest
-          path: binaries/windows/
-      - name: Debug artifact paths
-        run: ls -R binaries/
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: true
-          files: |
-            binaries/linux/manpass
-            binaries/macos/manpass
-            binaries/windows/manpass.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
