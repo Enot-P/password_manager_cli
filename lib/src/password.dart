@@ -8,12 +8,13 @@ import 'package:encrypt/encrypt.dart';
 
 class Password {
   late String _password;
-  get password => _password;
   static late final Key _key;
   late IV _iv;
   static Directory _passDir = Directory('passwords');
   static List<Password> _listPass = [];
   late String _encryptedData; // храним зашифрованные данные как base64 строку
+  get password => _password;
+  static get passDir => _passDir;
   final String name;
 
   // Статический блок инициализации для _key
